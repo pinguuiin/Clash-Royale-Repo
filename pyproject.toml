@@ -1,0 +1,26 @@
+[project]
+name = "clash-royale-meta"
+version = "0.1.0"
+description = "Clash Royale meta-analysis pipeline — ingestion layer"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+cr-discover-players = "ingestion.discover_players:main"
+cr-pull-battlelogs = "ingestion.pull_battlelogs:main"
+
+[tool.setuptools]
+# Implicit namespace package
+packages = ["ingestion"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
