@@ -153,26 +153,53 @@ def parse_battlelog(raw_battles, source_tag: str | None = None) -> list[dict]:
         out.append(parsed)
     return out
 
-# =========== Player Ranking Parser ===========================
+# =========== Clan / Member Parsers ===========================
 
-def parse_player_ranking(raw: dict) -> dict | None:
-    """Parse one entry from the global player-ranking response."""
+def parse_clan_ranking(raw: dict) -> dict | None:
+    """Parse one entry from a ``/rankings/clans`` response."""
     if not isinstance(raw, dict) or not raw.get("tag"):
         return None
-    clan = raw.get("clan") or {}
+    return {
+        "tag": raw.get("tag"),
+        "rank": raw.get("rank"),
+        "members": raw.get("members"),
+    }
+
+def parse_clan_rankings(raw: dict) -> list[dict]:
+    """Parse the ``{"items": [...]}`` clan-ranking payload into clean rows."""
+    items = (raw or {}).get("items", [])
+    return [c for c in (parse_clan_ranking(i) for i in items) if c is not None]
+
+def parse_clan_member(raw: dict) -> dict | None:
+    """Parse one entry from a ``/clans/{tag}/members`` response.
+
+    These member rows are the player seed for the battlelog fan-out; ``tag`` is
+    the only field downstream strictly needs, the rest are kept for context.
+    """
+    if not isinstance(raw, dict) or not raw.get("tag"):
+        return None
     return {
         "tag": raw.get("tag"),
         "name": raw.get("name"),
-        "rank": raw.get("rank"),
-        "previous_rank": raw.get("previousRank"),
         "trophies": raw.get("trophies"),
-        "clan_tag": clan.get("tag"),
     }
 
-def parse_rankings(raw: dict) -> list[dict]:
-    """Parse the ``{"items": [...]}`` ranking payload into clean rows."""
+def parse_clan_members(raw: dict, clan_tag: str | None = None) -> list[dict]:
+    """Parse a clan members payload into clean rows.
+
+    ``clan_tag`` (the clan this list came from) is attached to each row for
+    lineage, since the member entries don't carry their own clan reference.
+    """
     items = (raw or {}).get("items", [])
-    return [r for r in (parse_player_ranking(i) for i in items) if r is not None]
+    out: list[dict] = []
+    for item in items:
+        member = parse_clan_member(item)
+        if member is None:
+            continue
+        if clan_tag is not None:
+            member["clan_tag"] = clan_tag
+        out.append(member)
+    return out
 
 # =========== Card Parser =====================================
 

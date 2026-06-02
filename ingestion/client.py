@@ -134,9 +134,13 @@ class ClashRoyaleClient:
         raise ClashRoyaleAPIError(0, url, "get() logic error")
 
     # -- typed endpoint helpers -----------------------------------------
-    def get_top_players(self, limit: int = 1000) -> dict:
-        """`/locations/global/rankings/players` — top-ladder ranking."""
-        return self.get("/locations/global/rankings/players", params={"limit": limit})
+    def get_top_clans(self, location_id: str = "global", limit: int = 1000) -> dict:
+        """`/locations/{location_id}/rankings/clans` — top clans in a location."""
+        return self.get(f"/locations/{location_id}/rankings/clans", params={"limit": limit})
+
+    def get_clan_members(self, clan_tag: str) -> dict:
+        """`/clans/{tag}/members` — current member list of a clan."""
+        return self.get(f"/clans/{encode_tag(clan_tag)}/members")
 
     def get_battlelog(self, tag: str) -> list:
         """`/players/{tag}/battlelog` — last ~25 battles for a player.
