@@ -141,20 +141,42 @@ clash-royale-meta/
 
 ## Running it
 
-**Ingestion (local — runs off Databricks to avoid burning compute on rate-limit waits):**
+### Ingestion (local — runs off Databricks to avoid burning compute on rate-limit waits):
+
+1. Create a key on the official API to access Clash Royale data. The API token requires static IPs. For most dynamic home IPs, requests need to route through the community [RoyaleAPI proxy](https://docs.royaleapi.com/proxy.html)
+
+2. Set up virtual environment and install dependencies
 
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -e ".[dev]"      # requests + python-dotenv (+ pytest)
-
-cp .env.example .env                   # add your CR_API_TOKEN
-.venv/bin/python -m ingestion.discover_players --limit 1000
-.venv/bin/python -m ingestion.pull_battlelogs --max-players 200   # --resume to continue a crashed batch
+python3 -m venv .venv                  # create the python virtual environment
+source .venv/bin/activate              # activate it
+pip install -e ".[dev]"                # install requests + python-dotenv (+ pytest)
 ```
 
-The API token is IP-locked, so requests route through the community [RoyaleAPI proxy](https://docs.royaleapi.com/proxy.html) to handle dynamic home IPs.
+3. Copy `.env.example` to `.env` and add your `CR_API_TOKEN` to `.env`. **(Remember to add .env to .gitignore to protect you token info!)**
 
-**Transformation (Databricks):** run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → (gold, planned).
+```bash
+cp .env.example .env
+```
+
+4. Run the script `discover_players`/`pull_cards`/`pull_battlelogs` under ingestion/ to pull data from the server
+
+Examples on flag usage:
+```bash
+python -m ingestion.discover_players --max-clans 200 --out data/raw/players.json          # pull player seed (e.g. all members from top 200 clans)
+python -m ingestion.discover_players --location 57000000   # Europe only                  # can also add location id to limit the region
+
+python -m ingestion.pull_cards --out data/raw/cards.json            # pull cards information
+
+python -m ingestion.pull_battlelogs --players-file data/raw/players.json        # pull battlelog from all discovered players
+python -m ingestion.pull_battlelogs --resume                                    # or --resume to continue the newest batch
+python -m ingestion.pull_battlelogs --batch-id 20260530T0900                    # or specify a batch to continue 
+```
+
+and then copy the downloaded data to Databricks Unity Catalog. (automation in progress)
+
+### Transformation (Databricks):
+run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → (gold, planned).
 
 ---
 
