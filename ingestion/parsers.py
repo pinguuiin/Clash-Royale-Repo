@@ -41,10 +41,10 @@ def _win_flag(player_crowns, opponent_crowns) -> bool | None:
 def make_battle_id(battle_time_raw: str | None, player_tag: str, opponent_tag: str) -> str:
     """Create deterministic, collision-resistant id for a battle.
 
-    The API does not supply a battle id, so we derive one from the fields that
-    together identify a match: its timestamp and the two participants (order-
-    independent). Deterministic derivation is what lets the bronze ``MERGE`` be
-    idempotent and the ``battle_id`` uniqueness check mean something.
+    The API does not supply a battle id, so we derive a unique hash value from
+    the fields that together identify a match: its timestamp and the two
+    participants (order-independent). Missing player/opponent tags or battle time
+    will be checked in the later stages.
     """
     parts = [battle_time_raw or "", *sorted([player_tag or "", opponent_tag or ""])]
     return hashlib.sha1("|".join(parts).encode("utf-8")).hexdigest()
