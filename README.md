@@ -176,7 +176,10 @@ python -m ingestion.pull_battlelogs --batch-id 20260530T0900                    
 and then copy the downloaded data to Databricks Unity Catalog. (automation in progress)
 
 ### Transformation (Databricks):
-run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → (gold, planned).
+
+5. Create a subfolder named **clash** under your Databricks workspace, and copy the local files in the `notebooks/` folder there.
+
+6. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → (gold, planned).
 
 ---
 
