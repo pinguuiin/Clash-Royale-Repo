@@ -1,0 +1,19 @@
+{
+  "type": "PvP",
+  "battleTime": "not-a-timestamp",
+  "arena": null,
+  "gameMode": { "id": 72000006, "name": "Ladder" },
+  "team": [
+    {
+      "tag": "#PPVL99U0R",
+      "name": "flazrael",
+      "crowns": "two",
+      "cards": [
+        { "id": 26000000, "name": "Knight", "level": 14 },
+        { "name": "Nameless Card With No Id", "level": 9 },
+        { "id": 26000021, "name": "Hog Rider", "level": 14 }
+      ]
+    }
+  ],
+  "opponent": []
+}

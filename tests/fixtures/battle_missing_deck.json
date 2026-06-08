@@ -1,0 +1,35 @@
+{
+  "type": "PvP",
+  "battleTime": "20260608T021039.000Z",
+  "arena": { "id": 54000031, "name": "Legendary Arena" },
+  "gameMode": { "id": 72000006, "name": "Ladder" },
+  "team": [
+    {
+      "tag": "#PPVL99U0R",
+      "name": "flazrael",
+      "startingTrophies": 7421,
+      "trophyChange": 30,
+      "crowns": 1,
+      "cards": [
+        { "id": 26000000, "name": "Knight", "level": 14 },
+        { "id": 26000027, "name": "Baby Dragon", "level": 11 },
+        { "id": 26000021, "name": "Hog Rider", "level": 14 },
+        { "id": 26000010, "name": "Musketeer", "level": 13 },
+        { "id": 28000000, "name": "Fireball", "level": 14 },
+        { "id": 28000001, "name": "Arrows", "level": 14 },
+        { "id": 27000001, "name": "Cannon", "level": 13 },
+        { "id": 26000040, "name": "Ice Spirit", "level": 14 }
+      ]
+    }
+  ],
+  "opponent": [
+    {
+      "tag": "#PVLCGV9R",
+      "name": "Jeffrex",
+      "startingTrophies": 7405,
+      "trophyChange": -30,
+      "crowns": 1,
+      "cards": []
+    }
+  ]
+}
