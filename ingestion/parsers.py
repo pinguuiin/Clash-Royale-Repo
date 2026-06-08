@@ -107,14 +107,16 @@ def parse_battle(raw: dict) -> dict | None:
 
     arena = raw.get("arena") or {}
     game_mode = raw.get("gameMode") or {}
+    game_mode_name = game_mode.get("name")
 
     return {
         "battle_id": make_battle_id(battle_time_raw, player_tag or "", opponent_tag or ""),
         "battle_time": parse_battle_time(battle_time_raw),
         "battle_time_raw": battle_time_raw,
         "type": raw.get("type"),
-        "is_ladder": raw.get("type") == "PvP",
-        "game_mode": game_mode.get("name"),
+        # Note this excludes Path of Legend ranked ("Ranked1v1_*")
+        "is_ladder": game_mode_name == "Ladder",
+        "game_mode": game_mode_name,
         "arena_id": arena.get("id"),
         "arena_name": arena.get("name"),
         # Subject player
