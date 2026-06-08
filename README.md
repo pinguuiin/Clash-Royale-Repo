@@ -16,8 +16,8 @@ Built on **Databricks Free Edition** with **PySpark** and **Delta Lake**, follow
 | Quality checks | ✅ Done | validation + quarantine + completeness reporting → `dq_results` |
 | Gold (metrics) | 🚧 Planned | deck/card win-rate, pick-rate, meta-concentration |
 | Dashboard | 🚧 Planned | finding zone + live data-quality tile |
-| pytest suite | 🚧 Planned | unit tests for the pure parser functions |
-| CI / scheduling | 🚧 Planned | GitHub Actions: pytest on push, daily ingest cron |
+| pytest suite | ✅ Done | unit tests for the pure parser functions |
+| CI / scheduling | 🚧 Partial | GitHub Actions: ✅ pytest on push/PR, 🚧 daily ingest cron |
 
 **Current corpus:** 315,798 unique battles across 62 days, seeded from 9,964 top-ladder players, over 121 cards — ~5.2M card-appearances in the silver layer.
 
@@ -97,7 +97,7 @@ All tables live in Unity Catalog under `workspace.clash`.
 
 Two reliability layers, kept deliberately separate:
 
-- *(planned)* **Code tests (pytest)** verify *the code is correct* — pure parser functions against fixtures.
+- **Code tests (pytest)** verify *the code is correct* — pure parser functions against fixtures (`tests/`, run with `pytest`).
 - **In-pipeline checks** verify today's data is fit for use. They **record and continue** — bad rows are quarantined, never silently dropped — so the pipeline stays observable.
 
 
@@ -129,6 +129,11 @@ clash-royale-meta/
 │   ├── discover_players.py         # seed top-ladder player tags
 │   ├── pull_battlelogs.py          # checkpointed per-player battlelog pull
 │   └── pull_cards.py               # card dimension pull
+├── tests/                          # pytest — the code-reliability layer
+│   ├── conftest.py                 # fixture loaders
+│   ├── fixtures/                   # raw-API-shaped JSON (normal + edge cases)
+│   ├── test_parsers.py             # battlelog parser tests
+│   └── test_ingestion.py           # clan / member / card parser tests
 ├── notebooks/                      # PySpark on Databricks
 │   ├── bronze_ingest.ipynb         # raw JSON → schema-enforced Delta
 │   ├── silver_transform.ipynb      # type, model, explode, broadcast-join
@@ -190,7 +195,7 @@ and then copy the downloaded data to Databricks Unity Catalog. (automation in pr
 | Lakehouse | Databricks Free Edition, Delta Lake, Unity Catalog |
 | Processing | PySpark (broadcast joins, window functions) |
 | Ingestion | Python — `requests`, `python-dotenv` |
-| Reliability | pytest *(planned)* + in-pipeline data-quality checks |
+| Reliability | pytest + in-pipeline data-quality checks |
 | Orchestration | GitHub Actions cron + Databricks Jobs API *(planned)* |
 
 
