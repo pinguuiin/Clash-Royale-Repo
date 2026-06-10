@@ -91,6 +91,7 @@ All tables live in Unity Catalog under `workspace.clash`.
 | Quality | `quarantine_battles` | one row / flagged battle | Failing battles, retained for inspection |
 | Gold | `gold_card_metrics` | one row / card | Win rate, pick rate, sample size + `elixir_band`, scoped to trophy ladder |
 | Gold | `gold_overview` | one row | Dashboard KPIs — totals, distinct players, freshness, validity |
+| Gold | `gold_mode_breakdown` | one row / game mode | Battle count + share per mode; shows the trophy-ladder slice of all play |
 
 ---
 
