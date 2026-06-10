@@ -14,7 +14,7 @@ Built on **Databricks Free Edition** with **PySpark** and **Delta Lake**, follow
 | Bronze (raw Delta) | ✅ Done | `bronze_battles`, `bronze_cards`, `bronze_players` |
 | Silver (modelled) | ✅ Done | `dim_cards`, `silver_battles`, `silver_deck_cards` |
 | Quality checks | ✅ Done | validation + quarantine + completeness reporting → `dq_results` |
-| Gold (metrics) | 🚧 Planned | deck/card win-rate, pick-rate, meta-concentration |
+| Gold (metrics) | ✅ Done | card win-rate + pick-rate (`gold_card_metrics`), KPI tiles (`gold_overview`) |
 | Dashboard | 🚧 Planned | finding zone + live data-quality tile |
 | pytest suite | ✅ Done | unit tests for the pure parser functions |
 | CI / scheduling | 🚧 Partial | GitHub Actions: ✅ pytest on push/PR, 🚧 daily ingest cron |
@@ -89,7 +89,8 @@ All tables live in Unity Catalog under `workspace.clash`.
 | Silver | `silver_deck_cards` | one row / card played | Decks exploded (16/battle), broadcast-joined to `dim_cards` |
 | Quality | `dq_results` | one row / check / run | Check outcomes + metrics (appended as history) |
 | Quality | `quarantine_battles` | one row / flagged battle | Failing battles, retained for inspection |
-| Gold | `gold_deck_metrics` | one row / deck | 🚧 Planned — win rate, pick rate, sample size |
+| Gold | `gold_card_metrics` | one row / card | Win rate, pick rate, sample size + `elixir_band`, scoped to trophy ladder |
+| Gold | `gold_overview` | one row | Dashboard KPIs — totals, distinct players, freshness, validity |
 
 ---
 
@@ -138,7 +139,7 @@ clash-royale-meta/
 │   ├── bronze_ingest.ipynb         # raw JSON → schema-enforced Delta
 │   ├── silver_transform.ipynb      # type, model, explode, broadcast-join
 │   ├── silver_quality_checks.ipynb # validate + quarantine + completeness
-│   └── gold_metrics.ipynb          # 🚧 planned
+│   └── gold_metrics.ipynb          # card win/pick rate + overview KPIs
 └── data/                           # local raw JSON (gitignored)
 ```
 
@@ -184,7 +185,7 @@ and then copy the downloaded data to Databricks Unity Catalog. (automation in pr
 
 5. Create a subfolder named **clash** under your Databricks workspace, and copy the local files in the `notebooks/` folder there.
 
-6. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → (gold, planned).
+6. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → `gold_metrics`.
 
 ---
 
