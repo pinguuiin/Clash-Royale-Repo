@@ -12,14 +12,23 @@ dependencies = [
 dev = [
     "pytest>=8.0",
 ]
+# Databricks SDK — only needed by the orchestration steps (upload / job trigger)
+# in the daily workflow, not by the ingestion scripts or pytest. Kept out of the
+# base deps so CI's pytest job stays lean.
+databricks = [
+    "databricks-sdk>=0.30",
+]
 
 [project.scripts]
 cr-discover-players = "ingestion.discover_players:main"
 cr-pull-battlelogs = "ingestion.pull_battlelogs:main"
+cr-pull-cards = "ingestion.pull_cards:main"
+cr-upload-databricks = "orchestration.upload_to_databricks:main"
+cr-trigger-databricks-job = "orchestration.trigger_databricks_job:main"
 
 [tool.setuptools]
-# Implicit namespace package
-packages = ["ingestion"]
+# Implicit namespace packages
+packages = ["ingestion", "orchestration"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

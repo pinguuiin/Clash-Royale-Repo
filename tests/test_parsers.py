@@ -65,7 +65,7 @@ def test_deck_hash_distinguishes_decks():
 def test_deck_hash_empty_is_none():
     assert deck_hash([]) is None
 
-# ========== parse_battle — happy path ========================================
+# ========== parse_battle — normal case =======================================
 
 def test_parse_battle_normal_core_fields(battle_normal):
     rec = parse_battle(battle_normal)
@@ -89,7 +89,7 @@ def test_parse_battle_win_flag(battle_normal):
     # team crowns 2 > opponent crowns 0 -> win.
     assert parse_battle(battle_normal)["win"] is True
 
-# ========== parse_battle — missing deck edge case (ARCHITECTURE §3.6) ========
+# ========== parse_battle — missing deck edge case ============================
 
 def test_parse_battle_missing_deck_does_not_raise(battle_missing_deck):
     assert parse_battle(battle_missing_deck) is not None
@@ -107,7 +107,7 @@ def test_parse_battle_missing_deck_tie_win_flag(battle_missing_deck):
     # 1 crown each -> not a win (and not None, since both crowns are present).
     assert parse_battle(battle_missing_deck)["win"] is False
 
-# ========== parse_battle — malformed edge case (ARCHITECTURE §3.6) ===========
+# ========== parse_battle — malformed edge case ============================
 
 def test_parse_battle_malformed_does_not_raise(battle_malformed):
     assert parse_battle(battle_malformed) is not None

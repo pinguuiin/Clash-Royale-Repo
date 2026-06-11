@@ -15,9 +15,9 @@ Built on **Databricks Free Edition** with **PySpark** and **Delta Lake**, follow
 | Silver (modelled) | ✅ Done | `dim_cards`, `silver_battles`, `silver_deck_cards` |
 | Quality checks | ✅ Done | validation + quarantine + completeness reporting → `dq_results` |
 | Gold (metrics) | ✅ Done | card win-rate + pick-rate (`gold_card_metrics`), KPI tiles (`gold_overview`) |
-| Dashboard | 🚧 Planned | finding zone + live data-quality tile |
+| Dashboard | ✅ Done | live data-quality tiles and card metrics |
 | pytest suite | ✅ Done | unit tests for the pure parser functions |
-| CI / scheduling | 🚧 Partial | GitHub Actions: ✅ pytest on push/PR, 🚧 daily ingest cron |
+| CI / scheduling | ✅ Done | GitHub Actions: pytest on push/PR + daily ingest cron → UC volume upload → Databricks job trigger |
 
 **Current corpus:** 315,798 unique battles across 62 days, seeded from 9,964 top-ladder players, over 121 cards — ~5.2M card-appearances in the silver layer.
 
@@ -131,6 +131,9 @@ clash-royale-meta/
 │   ├── discover_players.py         # seed top-ladder player tags
 │   ├── pull_battlelogs.py          # checkpointed per-player battlelog pull
 │   └── pull_cards.py               # card dimension pull
+├── orchestration/                  # glue: local raw JSON → Databricks
+│   ├── upload_to_databricks.py     # mirror raw JSON into the UC volume (Databricks SDK)
+│   └── trigger_databricks_job.py   # run the bronze→gold job + wait (Jobs API)
 ├── tests/                          # pytest — the code-reliability layer
 │   ├── conftest.py                 # fixture loaders
 │   ├── fixtures/                   # raw-API-shaped JSON (normal + edge cases)
@@ -141,6 +144,9 @@ clash-royale-meta/
 │   ├── silver_transform.ipynb      # type, model, explode, broadcast-join
 │   ├── silver_quality_checks.ipynb # validate + quarantine + completeness
 │   └── gold_metrics.ipynb          # card win/pick rate + overview KPIs
+├── .github/workflows/              # GitHub Actions
+│   ├── ci.yml                      # pytest on push/PR
+│   └── daily.yml                   # daily cron: ingest → upload → trigger job
 └── data/                           # local raw JSON (gitignored)
 ```
 
@@ -180,13 +186,34 @@ python -m ingestion.pull_battlelogs --resume                                    
 python -m ingestion.pull_battlelogs --batch-id 20260530T0900                    # or specify a batch to continue 
 ```
 
-and then copy the downloaded data to Databricks Unity Catalog. (automation in progress)
+5. Upload the local raw JSON to the Unity Catalog volume, then (optionally) trigger the notebook chain — both wrap the Databricks SDK and read `DATABRICKS_HOST` / `DATABRICKS_TOKEN` from the environment:
+
+```bash
+pip install -e ".[databricks]"                           # adds the Databricks SDK
+python -m orchestration.upload_to_databricks             # mirror data/raw → /Volumes/workspace/clash/raw
+python -m orchestration.trigger_databricks_job --job-id 123456789   # run bronze→gold + wait
+```
 
 ### Transformation (Databricks):
 
-5. Create a subfolder named **clash** under your Databricks workspace, and copy the local files in the `notebooks/` folder there.
+6. Create a subfolder named **clash** under your Databricks workspace, and copy the local files in the `notebooks/` folder there.
 
-6. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → `gold_metrics`.
+7. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → `gold_metrics`.
+
+### Scheduling (GitHub Actions):
+
+Steps 4–7 run unattended every day via [`.github/workflows/daily.yml`](.github/workflows/daily.yml) (06:00 UTC, or trigger manually from the Actions tab): pull cards → discover the top 200 clans' members → pull battlelogs → upload raw JSON to the UC volume → trigger the Databricks job and wait.
+
+Set these as **repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Purpose |
+|---|---|
+| `CR_API_TOKEN` | Clash Royale token (created against the RoyaleAPI proxy IP) |
+| `DATABRICKS_HOST` | Workspace URL, e.g. `https://xxxx.cloud.databricks.com` |
+| `DATABRICKS_TOKEN` | PAT scoped to Files + Jobs |
+| `DATABRICKS_JOB_ID` | The Job id of the bronze→silver→gold notebook chain. Use 1049179186835703 |
+
+Optionally set a repository **variable** `DATABRICKS_VOLUME` to override the default volume path (`/Volumes/workspace/clash/raw`).
 
 ---
 
@@ -198,6 +225,6 @@ and then copy the downloaded data to Databricks Unity Catalog. (automation in pr
 | Processing | PySpark (broadcast joins, window functions) |
 | Ingestion | Python — `requests`, `python-dotenv` |
 | Reliability | pytest + in-pipeline data-quality checks |
-| Orchestration | GitHub Actions cron + Databricks Jobs API *(planned)* |
+| Orchestration | GitHub Actions cron + Databricks SDK / Jobs API |
 
 

@@ -1,0 +1,69 @@
+name: Daily ingest
+
+# Once a day: pull the card dimension + every member's battlelog from the top
+# 200 clans, upload the raw JSON to the Unity Catalog volume, then trigger the
+# Databricks notebook chain (bronze -> silver -> quality -> gold).
+#
+# Required GitHub repository secrets:
+#   CR_API_TOKEN       Clash Royale token (created against the RoyaleAPI proxy IP)
+#   DATABRICKS_HOST    e.g. https://<workspace>.cloud.databricks.com
+#   DATABRICKS_TOKEN   PAT scoped to Files + Jobs
+#   DATABRICKS_JOB_ID  job id of the bronze->silver->gold notebook chain
+# Optional repository variable:
+#   DATABRICKS_VOLUME  target volume dir (default: /Volumes/workspace/clash/raw)
+
+on:
+  schedule:
+    # 06:00 UTC daily
+    - cron: "0 6 * * *"
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# Don't let a slow run overlap with the next day's run.
+concurrency:
+  group: daily-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    env:
+      CR_API_TOKEN: ${{ secrets.CR_API_TOKEN }}
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABRICKS_JOB_ID: ${{ secrets.DATABRICKS_JOB_ID }}
+      DATABRICKS_VOLUME: ${{ vars.DATABRICKS_VOLUME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install package (with Databricks extras)
+        run: pip install -e ".[databricks]"
+
+      # 1. Card dimension — cheap full refresh.
+      - name: Pull card dimension
+        run: python -m ingestion.pull_cards
+
+      # 2. Seed player tags from the top 200 clans' members.
+      - name: Discover players (top 200 clans)
+        run: python -m ingestion.discover_players --max-clans 200
+
+      # 3. Pull every discovered player's battlelog into a checkpointed batch.
+      - name: Pull battlelogs
+        run: python -m ingestion.pull_battlelogs
+
+      # 4. Mirror the raw JSON (cards, players, battle batch) to the UC volume.
+      - name: Upload raw JSON to Unity Catalog volume
+        run: python -m orchestration.upload_to_databricks
+
+      # 5. Run the bronze -> silver -> quality -> gold notebook chain and wait.
+      - name: Trigger Databricks job
+        run: python -m orchestration.trigger_databricks_job
