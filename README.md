@@ -1,6 +1,6 @@
 # Clash Royale Meta Pipeline
 
-A game data pipeline that ingests real **Clash Royale** battle data at scale through the official API and processes it in a Databricks lakehouse to study the game's *meta* — which cards concentrate and win, and how fresh and complete the datasets are.
+A game data pipeline that ingests real **Clash Royale** battle data at scale through the official API and processes it in a Databricks lakehouse to study the game's *meta* — which cards concentrate and win, and how fresh and complete the datasets are. The report layer currently focuses on Trophy Ladder mode, with room to extend to other modes.
 
 Built on **Databricks Free Edition** with **PySpark** and **Delta Lake**, following a bronze → silver → gold medallion design, with data quality baked in as a complement of the silver layer rather than an afterthought.
 
