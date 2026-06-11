@@ -186,19 +186,27 @@ python -m ingestion.pull_battlelogs --resume                                    
 python -m ingestion.pull_battlelogs --batch-id 20260530T0900                    # or specify a batch to continue 
 ```
 
-5. Upload the local raw JSON to the Unity Catalog volume, then (optionally) trigger the notebook chain — both wrap the Databricks SDK and read `DATABRICKS_HOST` / `DATABRICKS_TOKEN` from the environment:
+### Transformation (Databricks):
+
+5. Create a sub path `clash/raw/` under `workspace/` in your Databricks Unity Catalog volume. (one-time)
+
+#### Option 1 (manually):
+
+6. Copy the local data under `data/raw/` to `clash/raw/` in the UC volume.
+
+7. Create another path in your Databricks workspace and copy your local notebooks under `notebooks/` there.
+
+8. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → `gold_metrics`.
+
+#### Option 2 (orchestration):
+
+6. Run the python scripts below to upload the local raw data to the Unity Catalog volume, then (optionally) trigger the notebook chain — both wrap the Databricks SDK and read `DATABRICKS_HOST` / `DATABRICKS_TOKEN` from the environment:
 
 ```bash
 pip install -e ".[databricks]"                           # adds the Databricks SDK
 python -m orchestration.upload_to_databricks             # mirror data/raw → /Volumes/workspace/clash/raw
 python -m orchestration.trigger_databricks_job --job-id 123456789   # run bronze→gold + wait
 ```
-
-### Transformation (Databricks):
-
-6. Create a subfolder named **clash** under your Databricks workspace, and copy the local files in the `notebooks/` folder there.
-
-7. Run the notebooks in order — `bronze_ingest` → `silver_transform` → `silver_quality_checks` → `gold_metrics`.
 
 ### Scheduling (GitHub Actions):
 
