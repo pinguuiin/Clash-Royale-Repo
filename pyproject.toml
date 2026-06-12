@@ -12,6 +12,7 @@ dependencies = [
 dev = [
     "pytest>=8.0",
 ]
+
 # Databricks SDK — only needed by the orchestration steps (upload / job trigger)
 # in the daily workflow, not by the ingestion scripts or pytest. Kept out of the
 # base deps so CI's pytest job stays lean.

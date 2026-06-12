@@ -21,6 +21,11 @@ import logging
 import os
 
 from databricks.sdk import WorkspaceClient
+from dotenv import load_dotenv
+
+# Load DATABRICKS_HOST/TOKEN/JOB_ID from .env so that the script can be run locally
+# without extra setup
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
