@@ -91,7 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     if not local_dir.exists():
         parser.error(f"{local_dir} not found — nothing to upload")
 
-    volume_dir = args.volume_dir or os.environ.get("DATABRICKS_VOLUME", DEFAULT_VOLUME_DIR)
+    volume_dir = args.volume_dir or os.environ.get("DATABRICKS_VOLUME") or DEFAULT_VOLUME_DIR
     upload_tree(local_dir, volume_dir)
     return 0
 

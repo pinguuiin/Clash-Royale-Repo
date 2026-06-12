@@ -57,8 +57,8 @@ def load_settings() -> Settings:
 
     return Settings(
         api_token=token,
-        base_url=os.environ.get("CR_API_BASE_URL", DEFAULT_BASE_URL).rstrip("/"),
-        raw_dir=Path(os.environ.get("CR_RAW_DIR", "data/raw")),
+        base_url=(os.environ.get("CR_API_BASE_URL") or DEFAULT_BASE_URL).rstrip("/"),
+        raw_dir=Path(os.environ.get("CR_RAW_DIR") or "data/raw"),
         request_timeout=_get_float("CR_REQUEST_TIMEOUT", 30.0),
         max_retries=_get_int("CR_MAX_RETRIES", 6),
         backoff_base=_get_float("CR_BACKOFF_BASE", 1.0),
