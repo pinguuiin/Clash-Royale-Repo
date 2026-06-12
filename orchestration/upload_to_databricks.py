@@ -40,8 +40,15 @@ logger = logging.getLogger(__name__)
 DEFAULT_VOLUME_DIR = "/Volumes/workspace/clash/raw"
 
 def iter_files(local_dir: Path) -> list[Path]:
-    """Return every file under ``local_dir`` (recursively), sorted for stable logs."""
-    return sorted(p for p in local_dir.rglob("*") if p.is_file())
+    """Return data files under ``local_dir`` (recursively), sorted for stable logs.
+
+    Skips files whose name starts with ``_`` / ``.`` as they are bookkeeping files.
+    (e.g. the ingestion ``_checkpoint.json``)
+    """
+    return sorted(
+        p for p in local_dir.rglob("*")
+        if p.is_file() and not p.name.startswith(("_", "."))
+    )
 
 def upload_tree(
     local_dir: Path,
