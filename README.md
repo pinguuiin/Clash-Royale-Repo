@@ -223,6 +223,13 @@ Set these as **repository secrets** (Settings → Secrets and variables → Acti
 
 Optionally set a repository **variable** `DATABRICKS_VOLUME` to override the default volume path (`/Volumes/workspace/clash/raw`).
 
+<br>
+<figure>
+      <img width="2215" height="1598" alt="CR_Jobs" src="https://github.com/user-attachments/assets/159804ef-0730-416a-b377-e517042d9313" />
+      <figcaption><em>Figure 1. Databricks Job log </em></figcaption>
+</figure>
+<br>
+
 ---
 
 ## Tech stack
