@@ -66,7 +66,7 @@ Clash Royale API proxy
 
 - **Schema enforced at the bronze boundary** — drift surfaces as a typed null in a known column, not a silently reshaped table.
 - Silver demonstrates **`explode`** (decks → one row per card), a **broadcast join** (tiny card dim against millions of fact rows), and **date partitioning** for query pruning.
-- **Order-independent deck hash** groups identical decks regardless of card order.
+- **Incremental processing** enabled by idempotent merge for bronze, and an `ingested_at` timestamp to filter new data for silver and quality check tables. Gold is recalculated in each run as it's small and metrics-based. 
 
 **Observability built in**
 
