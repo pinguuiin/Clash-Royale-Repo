@@ -25,9 +25,14 @@ Built on **Databricks Free Edition** with **PySpark** and **Delta Lake**, follow
 
 ## The question
 
-Competitive card games tend toward a **concentrated meta**: a handful of decks dominate the top of the ladder while the rest of the card pool sees little play. This pipeline is built to measure exactly how concentrated Clash Royale's high-ladder meta is, and which cards and decks drive it — win rate, pick rate, and how much of all play the top decks account for.
+Every Clash Royale player faces the same choice: which cards are worth a slot in the deck? This pipeline answers that from daily battle data. It measures **which cards win the most** and **which cards are played the most**, and sets both against **elixir cost** to show whether the strongest and most popular cards are cheap or expensive. Alongside the card rankings, it tracks **how battles are spread across game modes**, and reports **data freshness and validity** so the numbers can be trusted.
 
-*The headline finding and chart will land here once the gold + dashboard layers are built.*
+<br>
+<figure>
+      <img width="1645" height="1410" alt="Daily Report Dashboard" src="https://github.com/user-attachments/assets/73d5d72a-425a-498e-abad-c713a25f78f4" />
+      <figcaption><em>Figure 1. The Daily Report Dashboard with data-quality tiles and card metrics, built from golden layer</em></figcaption>
+</figure>
+<br>
 
 ---
 
@@ -226,7 +231,7 @@ Optionally set a repository **variable** `DATABRICKS_VOLUME` to override the def
 <br>
 <figure>
       <img width="2215" height="1598" alt="CR_Jobs" src="https://github.com/user-attachments/assets/159804ef-0730-416a-b377-e517042d9313" />
-      <figcaption><em>Figure 1. Databricks Job log </em></figcaption>
+      <figcaption><em>Figure 2. Databricks Job log </em></figcaption>
 </figure>
 <br>
 
