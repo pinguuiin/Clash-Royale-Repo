@@ -30,7 +30,7 @@ Every Clash Royale player faces the same choice: which cards are worth a slot in
 <br>
 <figure>
       <img width="1645" height="1410" alt="Daily Report Dashboard" src="https://github.com/user-attachments/assets/73d5d72a-425a-498e-abad-c713a25f78f4" />
-      <figcaption><em>Figure 1. The Daily Report Dashboard with data-quality tiles and card metrics, built from golden layer</em></figcaption>
+      <figcaption><em>Figure 1. The Daily Report Dashboard with data-quality tiles and card metrics, built from the gold layer</em></figcaption>
 </figure>
 <br>
 
@@ -215,7 +215,7 @@ python -m orchestration.trigger_databricks_job --job-id 123456789   # run bronze
 
 ### Scheduling (GitHub Actions):
 
-Steps 4–7 run unattended every day via [`.github/workflows/daily.yml`](.github/workflows/daily.yml) (06:00 UTC, or trigger manually from the Actions tab): pull cards → discover the top 200 clans' members → pull battlelogs → upload raw JSON to the UC volume → trigger the Databricks job and wait.
+Steps 4–6 (orchestration) run unattended every day via [`.github/workflows/daily.yml`](.github/workflows/daily.yml) (06:00 UTC, or trigger manually from the Actions tab): pull cards → discover the top 200 clans' members → pull battlelogs → upload raw JSON to the UC volume → trigger the Databricks job and wait.
 
 Set these as **repository secrets** (Settings → Secrets and variables → Actions):
 
